@@ -27,7 +27,6 @@ namespace HardOptimizer
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            // Process command-line switches
             foreach (var arg in args)
             {
                 if (string.Equals(arg, "/silent", StringComparison.OrdinalIgnoreCase))
@@ -36,7 +35,6 @@ namespace HardOptimizer
                     UNSAFE_MODE = true;
             }
 
-            // Single-instance enforcement
             bool createdNew;
             _mutex = new Mutex(true, MUTEX_GUID, out createdNew);
             if (!createdNew)
@@ -48,7 +46,6 @@ namespace HardOptimizer
 
             try
             {
-                // Require administrator privileges
                 if (!IsAdmin())
                 {
                     var exe = Process.GetCurrentProcess().MainModule?.FileName;
@@ -59,11 +56,10 @@ namespace HardOptimizer
                         Verb = "runas",
                         Arguments = string.Join(" ", args)
                     };
-                    try { Process.Start(psi); } catch { /* User cancelled UAC */ }
+                    try { Process.Start(psi); } catch { }
                     return;
                 }
 
-                // Verify Windows version (Windows 7+)
                 var os = Environment.OSVersion.Version;
                 if (os.Major < 6 || (os.Major == 6 && os.Minor < 1))
                 {
@@ -72,10 +68,8 @@ namespace HardOptimizer
                     return;
                 }
 
-                // Create system restore point at startup so user can undo changes
                 CreateRestorePoint("HardOptimizer Startup");
 
-                // Load settings and start main form
                 OptionsHelper.LoadSettings();
                 MainFormInstance = new MainForm(SILENT_MODE);
                 Application.Run(MainFormInstance);
@@ -107,25 +101,31 @@ namespace HardOptimizer
         {
             try
             {
-                // Use WMI to create a system restore point
-                using var searcher = new System.Management.ManagementObjectSearcher(
-                    "SELECT * FROM SystemRestore");
-                var restorePoints = searcher.Get();
-                foreach (var mo in restorePoints)
-                {
-                    try
-                    {
-                        var outParams = mo.InvokeMethod("CreateRestorePoint",
-                            new object[] { description, 0, 100 }, null); // 0=APPLICATION_INSTALL, 100=undetermined
-                        break;
-                    }
-                    catch { }
-                }
+                // SystemRestore is in root\default (not root\cimv2).
+                // Invoke the class method — do not SELECT instances (usually empty).
+                var scope = new System.Management.ManagementScope(@"\\.\root\default");
+                scope.Connect();
+
+                var path = new System.Management.ManagementPath("SystemRestore");
+                using var restoreClass = new System.Management.ManagementClass(scope, path, null);
+
+                // EventType 0 = APPLICATION_INSTALL; RestorePointType 100 = BEGIN_SYSTEM_CHANGE
+                object[] args = { description, 0, 100 };
+                var result = restoreClass.InvokeMethod("CreateRestorePoint", args);
+
+                int code = 0;
+                if (result != null)
+                    int.TryParse(result.ToString(), out code);
+
+                if (code == 0)
+                    Logger.Info("System restore point created: " + description);
+                else
+                    Logger.Info("CreateRestorePoint returned code: " + code);
             }
             catch (Exception ex)
             {
                 Logger.Log("Program.CreateRestorePoint", ex.Message, ex.StackTrace);
-                // Restore point creation failure is non-fatal
+                // Non-fatal: System Restore may be disabled
             }
         }
 

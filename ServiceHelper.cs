@@ -70,7 +70,8 @@ namespace HardOptimizer
         {
             try
             {
-                using var wmi = new System.Management.ManagementObject($"Win32_Service.Name='{svc.ServiceName}'");
+                var safeName = (svc.ServiceName ?? "").Replace("'", "\\'");
+                using var wmi = new System.Management.ManagementObject($"Win32_Service.Name='{safeName}'");
                 var startMode = wmi["StartMode"]?.ToString() ?? "Unknown";
                 return startMode;
             }
@@ -97,11 +98,14 @@ namespace HardOptimizer
         {
             try
             {
-                using var wmi = new System.Management.ManagementObject($"Win32_Service.Name='{serviceName}'");
+                var safeName = (serviceName ?? "").Replace("'", "\\'");
+                using var wmi = new System.Management.ManagementObject($"Win32_Service.Name='{safeName}'");
                 var inParams = wmi.GetMethodParameters("ChangeStartMode");
-                inParams["StartMode"] = startType;
-                var outParams = wmi.InvokeMethod("ChangeStartMode", inParams, null);
-                return true;
+                inParams["StartMode"] = startType; // "Automatic", "Manual", "Disabled"
+                var outParams = wmi.InvokeMethod("ChangeStartMode", inParams, null) as System.Management.ManagementBaseObject;
+                if (outParams == null) return false;
+                var returnValue = Convert.ToUInt32(outParams["ReturnValue"]);
+                return returnValue == 0;
             }
             catch { return false; }
         }

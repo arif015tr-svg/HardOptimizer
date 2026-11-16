@@ -1,0 +1,9 @@
+{
+  "adminMissingMsg": "Optimizer yönetici olarak çalıştırılmalı! Uygulama kapanıyor...",
+  "unsupportedMsg": "Optimizer Windows 7 ve üzeri gerekiyor! Uygulama kapanıyor...",
+  "confInvalidFormatMsg": "Yapılandırma dosyası geçersiz formatta!",
+  "confNotFoundMsg": "Yapılandırma dosyası bulunamadı!",
+  "argInvalidMsg": "Geçersiz argüman! Örnek: Optimizer.exe /config=win10.json",
+  "alreadyRunningMsg": "Optimizer arka planda zaten çalışıyor!",
+  "dnsCacheM": "DNS Önbelleği çalışıyor"
+}

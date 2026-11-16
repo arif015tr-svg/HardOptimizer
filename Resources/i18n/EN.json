@@ -1,0 +1,9 @@
+{
+  "adminMissingMsg": "Optimizer needs to be run as administrator! App will now close...",
+  "unsupportedMsg": "Optimizer works with Windows 7 and higher! App will now close...",
+  "confInvalidFormatMsg": "Config file is in invalid format!",
+  "confNotFoundMsg": "Config file does not exist!",
+  "argInvalidMsg": "Invalid argument! Example: Optimizer.exe /config=win10.json",
+  "alreadyRunningMsg": "Optimizer is already running in the background!",
+  "dnsCacheM": "DNS Cache is running"
+}

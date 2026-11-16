@@ -169,7 +169,7 @@ namespace HardOptimizer
             catch (Exception ex) { Logger.Log("OptimizeHelper.ApplyGamingOptimizations", ex.Message, ex.StackTrace); }
         }
 
-        private static void SetTcpAckFrequency()
+        internal static void SetTcpAckFrequency()
         {
             try
             {
@@ -199,6 +199,26 @@ namespace HardOptimizer
                 Registry.SetValue(@"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters", "TcpWindowSize", 262144, RegistryValueKind.DWord);
                 Registry.SetValue(@"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters", "DefaultTTL", 64, RegistryValueKind.DWord);
                 Registry.SetValue(@"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters", "DisableTaskOffload", 1, RegistryValueKind.DWord);
+            }
+            catch { }
+        }
+
+        internal static void DisableChromeTelemetry()
+        {
+            try
+            {
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Google\Chrome", "MetricsReportingEnabled", 0, RegistryValueKind.DWord);
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Google\Chrome", "ChromeCleanupEnabled", 0, RegistryValueKind.DWord);
+            }
+            catch { }
+        }
+
+        internal static void DisableEdgeTelemetry()
+        {
+            try
+            {
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge", "MetricsReportingEnabled", 0, RegistryValueKind.DWord);
+                Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge", "SendSiteInfoToImproveServices", 0, RegistryValueKind.DWord);
             }
             catch { }
         }

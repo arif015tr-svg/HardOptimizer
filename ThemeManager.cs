@@ -50,6 +50,8 @@ namespace HardOptimizer
         public Color ControlFill { get; private set; }
         public Color Stroke { get; private set; }
         public Color Danger { get; private set; }
+        public Color TextDisabled { get; private set; }
+        public Color ControlHover { get; private set; }
         public bool IsDark => Mode == ThemeMode.Dark;
 
         internal static Palette Create(ThemeMode mode, Color accent)
@@ -67,6 +69,8 @@ namespace HardOptimizer
                 p.ControlFill = Color.FromArgb(253, 253, 253);
                 p.Stroke = Color.FromArgb(225, 225, 225);
                 p.Danger = Color.FromArgb(196, 43, 28);
+                p.TextDisabled = Color.FromArgb(160, 160, 160);
+                p.ControlHover = Color.FromArgb(230, 230, 230);
                 p.AccentHover = Blend(accent, Color.Black, 0.10);
                 p.AccentPressed = Blend(accent, Color.Black, 0.20);
             }
@@ -79,6 +83,8 @@ namespace HardOptimizer
                 p.ControlFill = Color.FromArgb(55, 55, 55);
                 p.Stroke = Color.FromArgb(58, 58, 58);
                 p.Danger = Color.FromArgb(255, 153, 164);
+                p.TextDisabled = Color.FromArgb(120, 120, 120);
+                p.ControlHover = Color.FromArgb(70, 70, 70);
                 p.AccentHover = Blend(accent, Color.White, 0.10);
                 p.AccentPressed = Blend(accent, Color.Black, 0.15);
             }
